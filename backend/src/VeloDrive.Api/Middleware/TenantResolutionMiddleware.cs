@@ -7,22 +7,17 @@ public class TenantResolutionMiddleware
 {
     private readonly RequestDelegate _next;
 
-    public TenantResolutionMiddleware(RequestDelegate next)
-    {
-        _next = next;
-    }
+    public TenantResolutionMiddleware(RequestDelegate next) => _next = next;
 
-    public async Task InvokeAsync(HttpContext context, CurrentTenant currentTenant)
+    public async Task InvokeAsync(HttpContext context)
     {
         var hostname = context.Request.Host.Host;
         var subdomain = hostname.Split('.')[0];
 
         if (hostname == "localhost" || hostname == "127.0.0.1")
-        {
             subdomain = context.Request.Query["tenant"].FirstOrDefault() ?? "default";
-        }
 
-        currentTenant.Subdomain = subdomain;
+        TenantContext.Subdomain = subdomain;
 
         // Extract tenant_id from JWT if present
         var authHeader = context.Request.Headers.Authorization.FirstOrDefault();
@@ -35,22 +30,25 @@ public class TenantResolutionMiddleware
                 var jwt = handler.ReadJwtToken(token);
                 var tenantClaim = jwt.Claims.FirstOrDefault(c => c.Type == "tenant_id");
                 if (tenantClaim is not null && Guid.TryParse(tenantClaim.Value, out var tenantId))
-                {
-                    currentTenant.TenantId = tenantId;
-                }
+                    TenantContext.TenantId = tenantId;
             }
         }
 
-        context.Items["TenantSubdomain"] = subdomain;
-
-        await _next(context);
+        // Clear on response
+        try
+        {
+            await _next(context);
+        }
+        finally
+        {
+            TenantContext.TenantId = Guid.Empty;
+            TenantContext.Subdomain = string.Empty;
+        }
     }
 }
 
 public static class TenantResolutionMiddlewareExtensions
 {
     public static IApplicationBuilder UseTenantResolution(this IApplicationBuilder builder)
-    {
-        return builder.UseMiddleware<TenantResolutionMiddleware>();
-    }
+        => builder.UseMiddleware<TenantResolutionMiddleware>();
 }

@@ -122,6 +122,7 @@ public class ItemsController : ControllerBase
     }
 
     [HttpDelete("{id:guid}")]
+    [Authorize(Policy = Permissions.ItemsDelete)]
     public async Task<IActionResult> Delete(Guid id)
     {
         var item = await _db.Items.FindAsync(id);

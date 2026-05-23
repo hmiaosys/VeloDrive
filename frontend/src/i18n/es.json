@@ -1,0 +1,81 @@
+{
+  "app": {
+    "name": "VeloDrive",
+    "tagline": "Gestión de Alquileres"
+  },
+  "auth": {
+    "welcomeBack": "Bienvenido de nuevo",
+    "signIn": "Inicia sesión en tu panel de alquileres",
+    "email": "Correo electrónico",
+    "password": "Contraseña",
+    "signInButton": "Iniciar sesión",
+    "signingIn": "Iniciando sesión...",
+    "invalidCredentials": "Correo o contraseña inválidos.",
+    "newToVeloDrive": "¿Nuevo en VeloDrive?",
+    "createAccount": "Crear una cuenta",
+    "createYourAccount": "Crea tu cuenta",
+    "startManaging": "Comienza a gestionar tus alquileres",
+    "businessName": "Nombre del Negocio",
+    "subdomain": "Subdominio",
+    "yourName": "Tu Nombre",
+    "creating": "Creando...",
+    "createAccountButton": "Crear cuenta",
+    "alreadyHaveAccount": "¿Ya tienes una cuenta?",
+    "signInLink": "Iniciar sesión"
+  },
+  "sidebar": {
+    "dashboard": "Panel",
+    "items": "Artículos",
+    "addons": "Complementos",
+    "customers": "Clientes",
+    "bookings": "Reservas",
+    "quotes": "Cotizaciones",
+    "invoices": "Facturas",
+    "reports": "Informes",
+    "settings": "Configuración",
+    "signOut": "Cerrar sesión",
+    "quickSearch": "Búsqueda rápida..."
+  },
+  "dashboard": {
+    "greeting": "Buenos días, {{name}}",
+    "subtitle": "Tu negocio de un vistazo",
+    "newBooking": "Nueva Reserva",
+    "activeItems": "Artículos Activos",
+    "customers": "Clientes",
+    "activeBookings": "Reservas Activas",
+    "revenueMtd": "Ingresos (MTD)",
+    "revenueOverview": "Resumen de Ingresos",
+    "viewReports": "Ver informes",
+    "fleetUtilization": "Utilización de Flota",
+    "arAging": "Antigüedad de Cuentas",
+    "outstanding": "Pendiente",
+    "allClear": "Todo despejado — sin facturas pendientes.",
+    "upcomingBookings": "Próximas Reservas",
+    "viewAll": "Ver todo",
+    "noUpcoming": "Sin próximas reservas."
+  },
+  "common": {
+    "loading": "Cargando...",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "create": "Crear",
+    "search": "Buscar",
+    "noResults": "Sin resultados.",
+    "confirm": "Confirmar",
+    "back": "Atrás",
+    "next": "Siguiente"
+  },
+  "hero": {
+    "headline": "Administra tu negocio de alquileres",
+    "highlight": "sin hojas de cálculo",
+    "description": "Gestiona reservas, cotizaciones, facturas y pagos — todo en un solo lugar. Diseñado para alquiler de autobuses, escalable para todo.",
+    "feature1Title": "Gestión de Flota",
+    "feature1Desc": "Controla cada vehículo y su disponibilidad",
+    "feature2Title": "Reservas Inteligentes",
+    "feature2Desc": "Detección de conflictos incorporada",
+    "feature3Title": "CRM de Clientes",
+    "feature3Desc": "Historial, notas y seguimiento de ingresos"
+  }
+}

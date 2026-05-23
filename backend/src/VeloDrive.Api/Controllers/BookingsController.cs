@@ -88,10 +88,20 @@ public class BookingsController : ControllerBase
     [Authorize(Policy = Permissions.BookingsWrite)]
     public async Task<ActionResult<BookingResponse>> Create([FromBody] CreateBookingRequest request)
     {
+        // Validate request
+        if (request.Items is null || request.Items.Count == 0)
+            return BadRequest("At least one item is required.");
+
+        if (request.EndDate < request.StartDate)
+            return BadRequest("End date must be on or after start date.");
+
+        var customer = await _db.Customers.FirstOrDefaultAsync(c => c.Id == request.CustomerId);
+        if (customer is null) return BadRequest("Customer not found.");
+
         // Check availability
         foreach (var line in request.Items)
         {
-            var item = await _db.Items.FindAsync(line.ItemId);
+            var item = await _db.Items.FirstOrDefaultAsync(i => i.Id == line.ItemId);
             if (item is null) return BadRequest($"Item {line.ItemId} not found.");
 
             var bookedQty = await _db.BookingItems
@@ -128,8 +138,9 @@ public class BookingsController : ControllerBase
 
         foreach (var line in request.Items)
         {
-            var item = await _db.Items.FindAsync(line.ItemId);
-            var price = line.UnitPrice > 0 ? line.UnitPrice : item!.BasePrice;
+            var item = await _db.Items.FirstOrDefaultAsync(i => i.Id == line.ItemId);
+            if (item is null) continue;
+            var price = line.UnitPrice > 0 ? line.UnitPrice : item.BasePrice;
             var days = (request.EndDate.DayNumber - request.StartDate.DayNumber);
             if (days <= 0) days = 1;
 
@@ -145,10 +156,11 @@ public class BookingsController : ControllerBase
             booking.BookingItems.Add(bi);
         }
 
-        foreach (var line in request.AddOns)
+        if (request.AddOns is not null) foreach (var line in request.AddOns)
         {
-            var addon = await _db.ItemAddOns.FindAsync(line.AddOnId);
-            var price = line.UnitPrice > 0 ? line.UnitPrice : addon!.BasePrice;
+            var addon = await _db.ItemAddOns.FirstOrDefaultAsync(a => a.Id == line.AddOnId);
+            if (addon is null) continue;
+            var price = line.UnitPrice > 0 ? line.UnitPrice : addon.BasePrice;
 
             var ba = new BookingAddOn
             {
@@ -172,7 +184,6 @@ public class BookingsController : ControllerBase
         _db.Bookings.Add(booking);
 
         // Update customer stats
-        var customer = await _db.Customers.FindAsync(request.CustomerId);
         if (customer is not null)
         {
             customer.TotalBookings++;

@@ -1,4 +1,5 @@
 using System.Text;
+using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -9,7 +10,6 @@ using VeloDrive.Domain;
 using VeloDrive.Infrastructure;
 using VeloDrive.Api.Data;
 using VeloDrive.Api.Middleware;
-using VeloDrive.Domain;
 using VeloDrive.Infrastructure.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -38,7 +38,9 @@ builder.Services.AddIdentityCore<ApplicationUser>(options =>
     .AddDefaultTokenProviders();
 
 // JWT Authentication
-var jwtKey = builder.Configuration["Jwt:Key"] ?? "VeloDrive-Dev-Key-Change-In-Production-Min-32-Chars!!";
+var jwtKey = builder.Configuration["Jwt:Key"];
+if (string.IsNullOrEmpty(jwtKey))
+    throw new InvalidOperationException("JWT Key must be configured.");
 var jwtIssuer = builder.Configuration["Jwt:Issuer"] ?? "VeloDrive";
 var jwtAudience = builder.Configuration["Jwt:Audience"] ?? "VeloDrive";
 
@@ -77,8 +79,14 @@ builder.Services.AddAuthorization(options =>
 // Application layer (FluentValidation)
 builder.Services.AddApplication();
 
-// Controllers + Swagger
-builder.Services.AddControllers();
+// Controllers + Swagger + Validation
+builder.Services.AddFluentValidationAutoValidation();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(
+            new System.Text.Json.Serialization.JsonStringEnumConverter());
+    });
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -87,9 +95,12 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
     {
-        policy.AllowAnyOrigin()
+        policy.WithOrigins(
+                "http://localhost:3000",
+                "https://localhost:3000")
             .AllowAnyMethod()
-            .AllowAnyHeader();
+            .AllowAnyHeader()
+            .AllowCredentials();
     });
 });
 

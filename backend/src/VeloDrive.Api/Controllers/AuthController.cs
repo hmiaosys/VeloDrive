@@ -85,8 +85,9 @@ public class AuthController : ControllerBase
     [HttpPost("refresh")]
     public async Task<ActionResult<AuthResponse>> Refresh([FromBody] RefreshRequest request)
     {
+        var tokenHash = HashToken(request.RefreshToken);
         var user = await _db.Users.FirstOrDefaultAsync(u =>
-            u.RefreshToken == request.RefreshToken &&
+            u.RefreshToken == tokenHash &&
             u.RefreshTokenExpiresAt > DateTime.UtcNow);
 
         if (user is null)
@@ -117,7 +118,7 @@ public class AuthController : ControllerBase
         var accessToken = GenerateAccessToken(user, tenantId);
         var refreshToken = GenerateRefreshToken();
 
-        user.RefreshToken = refreshToken;
+        user.RefreshToken = HashToken(refreshToken);
         user.RefreshTokenExpiresAt = DateTime.UtcNow.AddDays(7);
         await _userManager.UpdateAsync(user);
 
@@ -166,6 +167,12 @@ public class AuthController : ControllerBase
     {
         var bytes = RandomNumberGenerator.GetBytes(64);
         return Convert.ToBase64String(bytes);
+    }
+
+    private static string HashToken(string token)
+    {
+        var hash = SHA256.HashData(Encoding.UTF8.GetBytes(token));
+        return Convert.ToHexString(hash);
     }
 
     private int GetJwtExpireMinutes()

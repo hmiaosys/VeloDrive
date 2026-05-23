@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using VeloDrive.Domain;
 using VeloDrive.Infrastructure.Persistence;
 
@@ -12,7 +13,7 @@ public static class SeedData
         var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
         var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
 
-        if (db.Tenants.Any()) return;
+        if (db.Tenants.IgnoreQueryFilters().Any()) return;
 
         // ===== TENANT =====
         var tenant = new Tenant
@@ -400,7 +401,7 @@ public static class SeedData
             TenantId = tenant.Id,
             BookingNumber = "BK-2026-0003",
             CustomerId = customer2.Id,
-            Status = BookingStatus.Draft,
+            Status = BookingStatus.Quoted,
             StartDate = new DateOnly(2026, 7, 10),
             EndDate = new DateOnly(2026, 7, 10),
             PickupLocation = "42 W Madison St, Chicago, IL 60602",
@@ -446,7 +447,7 @@ public static class SeedData
             CustomerId = customer2.Id,
             Status = QuoteStatus.Sent,
             ValidUntil = new DateTime(2026, 6, 10, 0, 0, 0, DateTimeKind.Utc),
-            ItemsSnapshot = """[{"item":"Mercedes-Benz Tourismo 54-Seater","qty":1,"price":650},{"item":"Yutong TC12 30-Seater","qty":1,"price":350}]""",
+            ItemsSnapshot = """{"items":[{"name":"Mercedes-Benz Tourismo 54-Seater","quantity":1,"unitPrice":650,"lineTotal":650},{"name":"Yutong TC12 30-Seater","quantity":1,"unitPrice":350,"lineTotal":350}],"addons":[]}""",
             Subtotal = 1000.00m,
             TotalAmount = 1000.00m,
             SentAt = new DateTime(2026, 5, 20, 14, 30, 0, DateTimeKind.Utc)

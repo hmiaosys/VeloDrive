@@ -30,7 +30,7 @@ public class QuotesController : ControllerBase
             query = query.Where(q => q.Status == s);
 
         var quotes = await query.OrderByDescending(q => q.CreatedOnUtc).Take(30)
-            .Select(q => new { q.Id, q.QuoteNumber, CustomerName = q.Customer.FirstName + " " + q.Customer.LastName, q.Status, q.Subtotal, q.TotalAmount, q.ValidUntil, q.CreatedOnUtc })
+            .Select(q => new { q.Id, q.QuoteNumber, CustomerName = q.Customer.FirstName + " " + q.Customer.LastName, Status = q.Status.ToString(), q.Subtotal, q.TotalAmount, q.ValidUntil, q.CreatedOnUtc })
             .ToListAsync();
 
         return Ok(quotes);
@@ -39,16 +39,32 @@ public class QuotesController : ControllerBase
     [HttpGet("{id:guid}")]
     public async Task<ActionResult> GetById(Guid id)
     {
-        var q = await _db.Quotes.Include(x => x.Customer).Include(x => x.Booking)
+        var q = await _db.Quotes
+            .Include(x => x.Customer)
+            .Include(x => x.Booking)
             .FirstOrDefaultAsync(x => x.Id == id);
+
         if (q is null) return NotFound();
-        return Ok(q);
+
+        return Ok(new
+        {
+            q.Id, q.QuoteNumber, q.Status,
+            Customer = new { q.Customer.Id, Name = q.Customer.FirstName + " " + q.Customer.LastName, q.Customer.Email, q.Customer.Phone },
+            q.Subtotal, q.TotalAmount, q.ValidUntil, q.ItemsSnapshot, q.PdfUrl,
+            q.SentAt, q.AcceptedAt, q.CreatedOnUtc,
+            Booking = q.Booking is null ? null : new { q.Booking.Id, q.Booking.BookingNumber, q.Booking.Status }
+        });
     }
 
     [HttpPost]
     [Authorize(Policy = Permissions.QuotesWrite)]
     public async Task<ActionResult> Create(Guid bookingId)
     {
+        // Check for existing quote
+        var existing = await _db.Quotes.FirstOrDefaultAsync(q => q.BookingId == bookingId);
+        if (existing is not null)
+            return Conflict($"A quote already exists for this booking ({existing.QuoteNumber}).");
+
         var booking = await _db.Bookings
             .Include(b => b.BookingItems).ThenInclude(bi => bi.Item)
             .Include(b => b.BookingAddOns).ThenInclude(ba => ba.AddOn)
@@ -82,22 +98,25 @@ public class QuotesController : ControllerBase
 
         await _db.SaveChangesAsync();
 
-        return CreatedAtAction(nameof(GetById), new { id = quote.Id }, quote);
+        return CreatedAtAction(nameof(GetById), new { id = quote.Id }, new { quote.Id, quote.QuoteNumber, Status = quote.Status.ToString(), quote.Subtotal, quote.TotalAmount, quote.ValidUntil });
     }
 
     [HttpPost("{id:guid}/send")]
     [Authorize(Policy = Permissions.QuotesSend)]
     public async Task<ActionResult> Send(Guid id)
     {
-        var quote = await _db.Quotes.FindAsync(id);
+        var quote = await _db.Quotes.FirstOrDefaultAsync(q => q.Id == id);
         if (quote is null) return NotFound();
+
+        if (quote.Status != QuoteStatus.Draft)
+            return BadRequest($"Only draft quotes can be sent. Current status: {quote.Status}.");
 
         quote.Status = QuoteStatus.Sent;
         quote.SentAt = DateTime.UtcNow;
         quote.UpdatedOnUtc = DateTime.UtcNow;
         await _db.SaveChangesAsync();
 
-        return Ok(new { quote.Id, quote.Status, quote.SentAt });
+        return Ok(new { quote.Id, Status = quote.Status.ToString(), quote.SentAt });
     }
 
     [HttpPost("{id:guid}/accept")]
@@ -106,6 +125,9 @@ public class QuotesController : ControllerBase
     {
         var quote = await _db.Quotes.Include(q => q.Booking).FirstOrDefaultAsync(q => q.Id == id);
         if (quote is null) return NotFound();
+
+        if (quote.Status != QuoteStatus.Sent)
+            return BadRequest($"Only sent quotes can be accepted. Current status: {quote.Status}.");
 
         quote.Status = QuoteStatus.Accepted;
         quote.AcceptedAt = DateTime.UtcNow;
@@ -118,6 +140,6 @@ public class QuotesController : ControllerBase
         }
 
         await _db.SaveChangesAsync();
-        return Ok(new { quote.Id, quote.Status });
+        return Ok(new { quote.Id, Status = quote.Status.ToString() });
     }
 }

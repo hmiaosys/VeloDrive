@@ -98,6 +98,7 @@ public class CategoriesController : ControllerBase
     }
 
     [HttpDelete("{id:guid}")]
+    [Authorize(Policy = Permissions.CategoriesDelete)]
     public async Task<IActionResult> Delete(Guid id)
     {
         var category = await _db.ItemCategories.FindAsync(id);

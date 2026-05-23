@@ -34,10 +34,18 @@ public class AddOnsController : ControllerBase
 
     [HttpPost]
     [Authorize(Policy = Permissions.AddOnsWrite)]
-    public async Task<ActionResult> Create([FromBody] ItemAddOn addon)
+    public async Task<ActionResult> Create([FromBody] AddOnDto input)
     {
-        addon.Id = Guid.NewGuid();
-        addon.TenantId = _tenant.TenantId;
+        var addon = new ItemAddOn
+        {
+            Id = Guid.NewGuid(),
+            TenantId = _tenant.TenantId,
+            Name = input.Name,
+            Description = input.Description,
+            UnitType = input.UnitType,
+            BasePrice = input.BasePrice,
+            IsPerItem = input.IsPerItem
+        };
         _db.ItemAddOns.Add(addon);
         await _db.SaveChangesAsync();
         return CreatedAtAction(nameof(GetAll), new { id = addon.Id }, addon);
@@ -45,7 +53,7 @@ public class AddOnsController : ControllerBase
 
     [HttpPut("{id:guid}")]
     [Authorize(Policy = Permissions.AddOnsWrite)]
-    public async Task<ActionResult> Update(Guid id, [FromBody] ItemAddOn input)
+    public async Task<ActionResult> Update(Guid id, [FromBody] AddOnDto input)
     {
         var addon = await _db.ItemAddOns.FindAsync(id);
         if (addon is null) return NotFound();
@@ -55,7 +63,6 @@ public class AddOnsController : ControllerBase
         addon.UnitType = input.UnitType;
         addon.BasePrice = input.BasePrice;
         addon.IsPerItem = input.IsPerItem;
-        addon.IsActive = input.IsActive;
         addon.UpdatedOnUtc = DateTime.UtcNow;
 
         await _db.SaveChangesAsync();
@@ -73,3 +80,10 @@ public class AddOnsController : ControllerBase
         return NoContent();
     }
 }
+
+public record AddOnDto(
+    string Name,
+    string? Description,
+    UnitType UnitType,
+    decimal BasePrice,
+    bool IsPerItem);

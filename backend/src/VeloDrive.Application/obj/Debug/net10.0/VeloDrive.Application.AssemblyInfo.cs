@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("VeloDrive.Application")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+03e8eeee16ff1908e4e14b154ea0ab018457ae68")]
 [assembly: System.Reflection.AssemblyProductAttribute("VeloDrive.Application")]
 [assembly: System.Reflection.AssemblyTitleAttribute("VeloDrive.Application")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

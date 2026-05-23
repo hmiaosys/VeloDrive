@@ -2,19 +2,16 @@ using System.Linq.Expressions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using VeloDrive.Application;
 using VeloDrive.Domain;
+using VeloDrive.Infrastructure.MultiTenancy;
 
 namespace VeloDrive.Infrastructure.Persistence;
 
 public class AppDbContext : IdentityDbContext<ApplicationUser, IdentityRole<Guid>, Guid>
 {
-    private readonly ICurrentTenant _currentTenant;
-
-    public AppDbContext(DbContextOptions<AppDbContext> options, ICurrentTenant currentTenant)
+    public AppDbContext(DbContextOptions<AppDbContext> options)
         : base(options)
     {
-        _currentTenant = currentTenant;
     }
 
     public DbSet<Tenant> Tenants => Set<Tenant>();
@@ -204,19 +201,21 @@ public class AppDbContext : IdentityDbContext<ApplicationUser, IdentityRole<Guid
         ApplyTenantFilter(builder);
     }
 
-    private void ApplyTenantFilter(ModelBuilder builder)
+    private static void ApplyTenantFilter(ModelBuilder builder)
     {
-        var tenantId = _currentTenant.TenantId;
-        if (tenantId == Guid.Empty) return;
-
         foreach (var entityType in builder.Model.GetEntityTypes())
         {
             if (!typeof(ITenantEntity).IsAssignableFrom(entityType.ClrType)) continue;
 
             var parameter = Expression.Parameter(entityType.ClrType, "e");
             var property = Expression.Property(parameter, nameof(ITenantEntity.TenantId));
-            var constant = Expression.Constant(tenantId);
-            var equality = Expression.Equal(property, constant);
+
+            // Read TenantId from TenantContext (AsyncLocal) dynamically per-request
+            var tenantContextType = typeof(TenantContext);
+            var tenantIdProperty = tenantContextType.GetProperty(nameof(TenantContext.TenantId))!;
+            var tenantIdExpr = Expression.Property(null, tenantIdProperty);
+
+            var equality = Expression.Equal(property, tenantIdExpr);
             var lambda = Expression.Lambda(equality, parameter);
 
             builder.Entity(entityType.ClrType).HasQueryFilter(lambda);
