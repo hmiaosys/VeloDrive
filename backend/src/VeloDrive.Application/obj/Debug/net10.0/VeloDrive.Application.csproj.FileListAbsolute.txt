@@ -1,0 +1,15 @@
+D:\Projects\VeloDrive\backend\src\VeloDrive.Application\bin\Debug\net10.0\VeloDrive.Application.deps.json
+D:\Projects\VeloDrive\backend\src\VeloDrive.Application\bin\Debug\net10.0\VeloDrive.Application.dll
+D:\Projects\VeloDrive\backend\src\VeloDrive.Application\bin\Debug\net10.0\VeloDrive.Application.pdb
+D:\Projects\VeloDrive\backend\src\VeloDrive.Application\bin\Debug\net10.0\VeloDrive.Domain.dll
+D:\Projects\VeloDrive\backend\src\VeloDrive.Application\bin\Debug\net10.0\VeloDrive.Domain.pdb
+D:\Projects\VeloDrive\backend\src\VeloDrive.Application\obj\Debug\net10.0\VeloDrive.Application.csproj.AssemblyReference.cache
+D:\Projects\VeloDrive\backend\src\VeloDrive.Application\obj\Debug\net10.0\VeloDrive.Application.GeneratedMSBuildEditorConfig.editorconfig
+D:\Projects\VeloDrive\backend\src\VeloDrive.Application\obj\Debug\net10.0\VeloDrive.Application.AssemblyInfoInputs.cache
+D:\Projects\VeloDrive\backend\src\VeloDrive.Application\obj\Debug\net10.0\VeloDrive.Application.AssemblyInfo.cs
+D:\Projects\VeloDrive\backend\src\VeloDrive.Application\obj\Debug\net10.0\VeloDrive.Application.csproj.CoreCompileInputs.cache
+D:\Projects\VeloDrive\backend\src\VeloDrive.Application\obj\Debug\net10.0\VeloDriv.616EE79F.Up2Date
+D:\Projects\VeloDrive\backend\src\VeloDrive.Application\obj\Debug\net10.0\VeloDrive.Application.dll
+D:\Projects\VeloDrive\backend\src\VeloDrive.Application\obj\Debug\net10.0\refint\VeloDrive.Application.dll
+D:\Projects\VeloDrive\backend\src\VeloDrive.Application\obj\Debug\net10.0\VeloDrive.Application.pdb
+D:\Projects\VeloDrive\backend\src\VeloDrive.Application\obj\Debug\net10.0\ref\VeloDrive.Application.dll

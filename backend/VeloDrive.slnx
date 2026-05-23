@@ -1,0 +1,11 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/VeloDrive.Api/VeloDrive.Api.csproj" />
+    <Project Path="src/VeloDrive.Application/VeloDrive.Application.csproj" />
+    <Project Path="src/VeloDrive.Domain/VeloDrive.Domain.csproj" />
+    <Project Path="src/VeloDrive.Infrastructure/VeloDrive.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/VeloDrive.Api.Tests/VeloDrive.Api.Tests.csproj" />
+  </Folder>
+</Solution>

@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(Get-ChildItem *)",
+      "PowerShell(Get-ChildItem -Recurse -Force \"D:\\\\Projects\\\\VeloDrive\" | ForEach-Object { $_.FullName })",
+      "Bash(Format-Table Name, Length, Mode -AutoSize)",
+      "Bash(Select-Object Mode, Name)"
+    ]
+  }
+}
