@@ -205,3 +205,4 @@ D:\Projects\VeloDrive\backend\tests\VeloDrive.Api.Tests\obj\Debug\net10.0\refint
 D:\Projects\VeloDrive\backend\tests\VeloDrive.Api.Tests\obj\Debug\net10.0\VeloDrive.Api.Tests.pdb
 D:\Projects\VeloDrive\backend\tests\VeloDrive.Api.Tests\obj\Debug\net10.0\VeloDrive.Api.Tests.genruntimeconfig.cache
 D:\Projects\VeloDrive\backend\tests\VeloDrive.Api.Tests\obj\Debug\net10.0\ref\VeloDrive.Api.Tests.dll
+D:\Projects\VeloDrive\backend\tests\VeloDrive.Api.Tests\obj\Debug\net10.0\VeloDrive.Api.Tests.sourcelink.json

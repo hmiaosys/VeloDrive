@@ -11,6 +11,7 @@ public class AuditLog : ITenantEntity
     public string? Changes { get; set; } // JSONB: { "from": {...}, "to": {...} }
     public string? IpAddress { get; set; }
     public DateTime CreatedOnUtc { get; set; } = DateTime.UtcNow;
+    public DateTime UpdatedOnUtc { get; set; } = DateTime.UtcNow;
 
     public Tenant Tenant { get; set; } = null!;
 }

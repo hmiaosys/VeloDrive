@@ -9,7 +9,8 @@ export async function loginAs(page: Page, email: string, password = 'Admin123!')
   await page.fill('input[type="email"]', email);
   await page.fill('input[type="password"]', password);
   await page.click('button[type="submit"]');
-  await page.waitForURL('/');
+  // Login redirects to /{account} — default for seed tenant
+  await page.waitForURL(/\/default/, { timeout: 10000 });
   await expect(page.locator('text=Good morning')).toBeVisible({ timeout: 10000 });
 }
 

@@ -28,7 +28,7 @@ export function InvoicesListPage() {
             <tbody>
               {invoices.map((inv: any) => (
                 <tr key={inv.id} className="border-b border-slate-100 hover:bg-slate-50/50">
-                  <td className="px-5 py-3"><Link to={`/invoices/${inv.id}`} className="font-medium hover:underline text-slate-900">{inv.invoiceNumber}</Link><div className="text-xs text-slate-400">{inv.bookingNumber}</div></td>
+                  <td className="px-5 py-3"><Link to={`../../invoices/${inv.id}`} className="font-medium hover:underline text-slate-900">{inv.invoiceNumber}</Link><div className="text-xs text-slate-400">{inv.bookingNumber}</div></td>
                   <td className="px-5 py-3 text-slate-500">{inv.customerName}</td>
                   <td className="px-5 py-3 text-slate-500">{inv.type}</td>
                   <td className="px-5 py-3 text-right">${inv.totalAmount.toFixed(2)}</td>

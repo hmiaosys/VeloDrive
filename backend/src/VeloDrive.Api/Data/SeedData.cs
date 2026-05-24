@@ -27,50 +27,31 @@ public static class SeedData
         };
         db.Tenants.Add(tenant);
 
-        // ===== USERS (for RBAC testing) =====
-        var owner = new ApplicationUser
-        {
-            Id = Guid.NewGuid(),
-            TenantId = tenant.Id,
-            UserName = "owner@metrobus.com",
-            Email = "owner@metrobus.com",
-            FullName = "Sarah Johnson",
-            Role = UserRole.Owner
-        };
-        await userManager.CreateAsync(owner, "Admin123!");
+        // ===== USERS + EMPLOYEES + CLAIMS =====
+        ApplicationUser CreateUser(string email) {
+            var u = new ApplicationUser { Id = Guid.NewGuid(), TenantId = tenant.Id, UserName = email, Email = email };
+            userManager.CreateAsync(u, "Admin123!").GetAwaiter().GetResult();
+            return u;
+        }
+        async Task AddClaims(ApplicationUser u, string[] perms) {
+            foreach (var p in perms) await userManager.AddClaimAsync(u, new System.Security.Claims.Claim("permission", p));
+        }
 
-        var admin = new ApplicationUser
-        {
-            Id = Guid.NewGuid(),
-            TenantId = tenant.Id,
-            UserName = "manager@metrobus.com",
-            Email = "manager@metrobus.com",
-            FullName = "Michael Chen",
-            Role = UserRole.Admin
-        };
-        await userManager.CreateAsync(admin, "Admin123!");
+        var owner = CreateUser("owner@metrobus.com");
+        db.Employees.Add(new Employee { Id = Guid.NewGuid(), TenantId = tenant.Id, UserId = owner.Id, FirstName = "Sarah", LastName = "Johnson", Email = "owner@metrobus.com", Position = "Owner" });
+        AddClaims(owner, Permissions.Templates["Owner"]).GetAwaiter().GetResult();
 
-        var staff1 = new ApplicationUser
-        {
-            Id = Guid.NewGuid(),
-            TenantId = tenant.Id,
-            UserName = "driver1@metrobus.com",
-            Email = "driver1@metrobus.com",
-            FullName = "James Wilson",
-            Role = UserRole.Staff
-        };
-        await userManager.CreateAsync(staff1, "Admin123!");
+        var manager = CreateUser("manager@metrobus.com");
+        db.Employees.Add(new Employee { Id = Guid.NewGuid(), TenantId = tenant.Id, UserId = manager.Id, FirstName = "Michael", LastName = "Chen", Email = "manager@metrobus.com", Position = "Manager" });
+        AddClaims(manager, Permissions.Templates["Owner"]).GetAwaiter().GetResult();
 
-        var staff2 = new ApplicationUser
-        {
-            Id = Guid.NewGuid(),
-            TenantId = tenant.Id,
-            UserName = "guide1@metrobus.com",
-            Email = "guide1@metrobus.com",
-            FullName = "Maria Garcia",
-            Role = UserRole.Staff
-        };
-        await userManager.CreateAsync(staff2, "Admin123!");
+        var staff1 = CreateUser("driver1@metrobus.com");
+        db.Employees.Add(new Employee { Id = Guid.NewGuid(), TenantId = tenant.Id, UserId = staff1.Id, FirstName = "James", LastName = "Wilson", Email = "driver1@metrobus.com", Position = "Driver" });
+        AddClaims(staff1, Permissions.Templates["Staff"]).GetAwaiter().GetResult();
+
+        var staff2 = CreateUser("guide1@metrobus.com");
+        db.Employees.Add(new Employee { Id = Guid.NewGuid(), TenantId = tenant.Id, UserId = staff2.Id, FirstName = "Maria", LastName = "Garcia", Email = "guide1@metrobus.com", Position = "Tour Guide" });
+        AddClaims(staff2, Permissions.Templates["Staff"]).GetAwaiter().GetResult();
 
         // ===== CATEGORIES =====
         var busCategory = new ItemCategory
@@ -197,7 +178,9 @@ public static class SeedData
             Description = "Licensed commercial driver with clean record. Includes fuel cost.",
             UnitType = UnitType.Day,
             BasePrice = 200.00m,
-            IsPerItem = true
+            IsPerItem = true,
+            Quantity = 3,
+            CustomFields = """[{"name":"James Wilson","license":"CDL-12345","phone":"+1-312-555-0105"},{"name":"Maria Garcia","license":"CDL-67890","phone":"+1-312-555-0106"}]"""
         };
         db.ItemAddOns.Add(driverAddOn);
 
@@ -209,7 +192,9 @@ public static class SeedData
             Description = "Multilingual tour guide with local expertise.",
             UnitType = UnitType.Day,
             BasePrice = 175.00m,
-            IsPerItem = false
+            IsPerItem = false,
+            Quantity = 2,
+            CustomFields = """[{"name":"Maria Garcia","languages":"English, Spanish","phone":"+1-312-555-0106"},{"name":"Carlos Ruiz","languages":"English, Portuguese","phone":"+1-312-555-0107"}]"""
         };
         db.ItemAddOns.Add(guideAddOn);
 
@@ -483,7 +468,7 @@ public static class SeedData
             Reference = "TRF-20260512-001",
             ReceivedAt = new DateTime(2026, 5, 12, 0, 0, 0, DateTimeKind.Utc),
             Notes = "Deposit received via wire transfer",
-            RecordedByUserId = admin.Id
+            RecordedByUserId = manager.Id
         };
         db.Payments.Add(payment1);
 
@@ -518,7 +503,7 @@ public static class SeedData
             Reference = "CHG-20260520-002",
             ReceivedAt = new DateTime(2026, 5, 20, 0, 0, 0, DateTimeKind.Utc),
             Notes = "Partial payment via credit card",
-            RecordedByUserId = admin.Id
+            RecordedByUserId = manager.Id
         };
         db.Payments.Add(payment2);
 

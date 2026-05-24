@@ -172,13 +172,6 @@ namespace VeloDrive.Infrastructure.Persistence.Migrations
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("boolean");
 
-                    b.Property<string>("FullName")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("boolean");
-
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("boolean");
 
@@ -207,9 +200,6 @@ namespace VeloDrive.Infrastructure.Persistence.Migrations
 
                     b.Property<DateTime?>("RefreshTokenExpiresAt")
                         .HasColumnType("timestamp with time zone");
-
-                    b.Property<int>("Role")
-                        .HasColumnType("integer");
 
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("text");
@@ -266,6 +256,9 @@ namespace VeloDrive.Infrastructure.Persistence.Migrations
 
                     b.Property<Guid>("TenantId")
                         .HasColumnType("uuid");
+
+                    b.Property<DateTime>("UpdatedOnUtc")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
@@ -372,6 +365,9 @@ namespace VeloDrive.Infrastructure.Persistence.Migrations
                     b.Property<Guid?>("BookingItemId")
                         .HasColumnType("uuid");
 
+                    b.Property<DateTime>("CreatedOnUtc")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<decimal>("LineTotal")
                         .HasColumnType("numeric");
 
@@ -380,6 +376,9 @@ namespace VeloDrive.Infrastructure.Persistence.Migrations
 
                     b.Property<decimal>("UnitPrice")
                         .HasColumnType("numeric");
+
+                    b.Property<DateTime>("UpdatedOnUtc")
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
@@ -401,6 +400,9 @@ namespace VeloDrive.Infrastructure.Persistence.Migrations
                     b.Property<Guid>("BookingId")
                         .HasColumnType("uuid");
 
+                    b.Property<DateTime>("CreatedOnUtc")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<Guid>("ItemId")
                         .HasColumnType("uuid");
 
@@ -412,6 +414,9 @@ namespace VeloDrive.Infrastructure.Persistence.Migrations
 
                     b.Property<decimal>("UnitPrice")
                         .HasColumnType("numeric");
+
+                    b.Property<DateTime>("UpdatedOnUtc")
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
@@ -474,6 +479,61 @@ namespace VeloDrive.Infrastructure.Persistence.Migrations
                     b.HasIndex("TenantId");
 
                     b.ToTable("Customers");
+                });
+
+            modelBuilder.Entity("VeloDrive.Domain.Employee", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedOnUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Email")
+                        .HasColumnType("text");
+
+                    b.Property<string>("EmergencyContact")
+                        .HasColumnType("text");
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Notes")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Phone")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Position")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("UpdatedOnUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TenantId");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
+
+                    b.ToTable("Employees");
                 });
 
             modelBuilder.Entity("VeloDrive.Domain.Invoice", b =>
@@ -616,6 +676,9 @@ namespace VeloDrive.Infrastructure.Persistence.Migrations
                     b.Property<DateTime>("CreatedOnUtc")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<string>("CustomFields")
+                        .HasColumnType("text");
+
                     b.Property<string>("Description")
                         .HasColumnType("text");
 
@@ -628,6 +691,9 @@ namespace VeloDrive.Infrastructure.Persistence.Migrations
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("integer");
 
                     b.Property<Guid>("TenantId")
                         .HasColumnType("uuid");
@@ -723,6 +789,9 @@ namespace VeloDrive.Infrastructure.Persistence.Migrations
 
                     b.Property<Guid>("TenantId")
                         .HasColumnType("uuid");
+
+                    b.Property<DateTime>("UpdatedOnUtc")
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
@@ -833,6 +902,9 @@ namespace VeloDrive.Infrastructure.Persistence.Migrations
                     b.Property<string>("Timezone")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<DateTime>("UpdatedOnUtc")
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
@@ -990,6 +1062,24 @@ namespace VeloDrive.Infrastructure.Persistence.Migrations
                     b.Navigation("Tenant");
                 });
 
+            modelBuilder.Entity("VeloDrive.Domain.Employee", b =>
+                {
+                    b.HasOne("VeloDrive.Domain.Tenant", "Tenant")
+                        .WithMany()
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("VeloDrive.Domain.ApplicationUser", "User")
+                        .WithOne("Employee")
+                        .HasForeignKey("VeloDrive.Domain.Employee", "UserId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Tenant");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("VeloDrive.Domain.Invoice", b =>
                 {
                     b.HasOne("VeloDrive.Domain.Booking", "Booking")
@@ -1101,6 +1191,11 @@ namespace VeloDrive.Infrastructure.Persistence.Migrations
                     b.Navigation("Customer");
 
                     b.Navigation("Tenant");
+                });
+
+            modelBuilder.Entity("VeloDrive.Domain.ApplicationUser", b =>
+                {
+                    b.Navigation("Employee");
                 });
 
             modelBuilder.Entity("VeloDrive.Domain.Booking", b =>

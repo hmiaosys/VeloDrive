@@ -156,11 +156,31 @@ public class BookingsController : ControllerBase
             booking.BookingItems.Add(bi);
         }
 
+        var rentalDays = (request.EndDate.DayNumber - request.StartDate.DayNumber);
+        if (rentalDays <= 0) rentalDays = 1;
+
         if (request.AddOns is not null) foreach (var line in request.AddOns)
         {
             var addon = await _db.ItemAddOns.FirstOrDefaultAsync(a => a.Id == line.AddOnId);
             if (addon is null) continue;
+
+            // Check add-on availability (same date-overlap logic as items)
+            if (addon.Quantity > 0)
+            {
+                var bookedAddOns = await _db.BookingAddOns
+                    .Where(ba => ba.AddOnId == line.AddOnId
+                        && ba.Booking.Status != BookingStatus.Canceled
+                        && ba.Booking.EndDate > request.StartDate
+                        && ba.Booking.StartDate < request.EndDate)
+                    .SumAsync(ba => ba.Quantity);
+
+                if (bookedAddOns + line.Quantity > addon.Quantity)
+                    return Conflict($"Add-on '{addon.Name}' is not available for these dates. {addon.Quantity - bookedAddOns} available, {line.Quantity} requested.");
+            }
             var price = line.UnitPrice > 0 ? line.UnitPrice : addon.BasePrice;
+
+            // Add-ons: Day/Hour charges multiply by rental days, Flat fees don't
+            var addOnDays = addon.UnitType is UnitType.Day or UnitType.Hour ? rentalDays : 1;
 
             var ba = new BookingAddOn
             {
@@ -170,7 +190,7 @@ public class BookingsController : ControllerBase
                 AddOnId = line.AddOnId,
                 Quantity = line.Quantity,
                 UnitPrice = price,
-                LineTotal = price * line.Quantity
+                LineTotal = price * line.Quantity * addOnDays
             };
             booking.BookingAddOns.Add(ba);
         }

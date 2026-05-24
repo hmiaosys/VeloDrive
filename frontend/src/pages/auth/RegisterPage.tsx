@@ -17,8 +17,8 @@ export function RegisterPage() {
     e.preventDefault(); setError(''); setLoading(true)
     try {
       const result = await authApi.register(form)
-      setAuth(result.accessToken, result.refreshToken, { id: result.user.id, tenantId: result.user.tenantId, email: result.user.email, fullName: result.user.fullName, role: result.user.role })
-      navigate('/')
+      setAuth(result.accessToken, result.refreshToken, { id: result.user.id, tenantId: result.user.tenantId, email: result.user.email, firstName: result.user.firstName, lastName: result.user.lastName, position: result.user.position, permissions: result.user.permissions, account: result.user.account })
+      navigate(`/${result.user.account}`)
     } catch (err: any) { setError(err.response?.data || 'Registration failed.') }
     finally { setLoading(false) }
   }

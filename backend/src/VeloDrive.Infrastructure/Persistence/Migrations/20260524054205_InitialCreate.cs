@@ -39,7 +39,8 @@ namespace VeloDrive.Infrastructure.Persistence.Migrations
                     Currency = table.Column<string>(type: "text", nullable: false),
                     SubscriptionStatus = table.Column<int>(type: "integer", nullable: false),
                     StripeCustomerId = table.Column<string>(type: "text", nullable: true),
-                    CreatedOnUtc = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                    CreatedOnUtc = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UpdatedOnUtc = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -79,7 +80,8 @@ namespace VeloDrive.Infrastructure.Persistence.Migrations
                     EntityId = table.Column<Guid>(type: "uuid", nullable: false),
                     Changes = table.Column<string>(type: "text", nullable: true),
                     IpAddress = table.Column<string>(type: "text", nullable: true),
-                    CreatedOnUtc = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                    CreatedOnUtc = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UpdatedOnUtc = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -133,6 +135,8 @@ namespace VeloDrive.Infrastructure.Persistence.Migrations
                     UnitType = table.Column<int>(type: "integer", nullable: false),
                     BasePrice = table.Column<decimal>(type: "numeric", nullable: false),
                     IsPerItem = table.Column<bool>(type: "boolean", nullable: false),
+                    Quantity = table.Column<int>(type: "integer", nullable: false),
+                    CustomFields = table.Column<string>(type: "text", nullable: true),
                     IsActive = table.Column<bool>(type: "boolean", nullable: false),
                     CreatedOnUtc = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UpdatedOnUtc = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
@@ -180,9 +184,6 @@ namespace VeloDrive.Infrastructure.Persistence.Migrations
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     TenantId = table.Column<Guid>(type: "uuid", nullable: false),
-                    FullName = table.Column<string>(type: "text", nullable: false),
-                    Role = table.Column<int>(type: "integer", nullable: false),
-                    IsActive = table.Column<bool>(type: "boolean", nullable: false),
                     RefreshToken = table.Column<string>(type: "text", nullable: true),
                     RefreshTokenExpiresAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     UserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
@@ -292,6 +293,41 @@ namespace VeloDrive.Infrastructure.Persistence.Migrations
                         principalTable: "Tenants",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Employees",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    TenantId = table.Column<Guid>(type: "uuid", nullable: false),
+                    UserId = table.Column<Guid>(type: "uuid", nullable: true),
+                    FirstName = table.Column<string>(type: "text", nullable: false),
+                    LastName = table.Column<string>(type: "text", nullable: false),
+                    Email = table.Column<string>(type: "text", nullable: true),
+                    Phone = table.Column<string>(type: "text", nullable: true),
+                    Position = table.Column<string>(type: "text", nullable: false),
+                    EmergencyContact = table.Column<string>(type: "text", nullable: true),
+                    Notes = table.Column<string>(type: "text", nullable: true),
+                    IsActive = table.Column<bool>(type: "boolean", nullable: false),
+                    CreatedOnUtc = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UpdatedOnUtc = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Employees", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Employees_Tenants_TenantId",
+                        column: x => x.TenantId,
+                        principalTable: "Tenants",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Employees_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.SetNull);
                 });
 
             migrationBuilder.CreateTable(
@@ -469,7 +505,9 @@ namespace VeloDrive.Infrastructure.Persistence.Migrations
                     ItemId = table.Column<Guid>(type: "uuid", nullable: false),
                     Quantity = table.Column<int>(type: "integer", nullable: false),
                     UnitPrice = table.Column<decimal>(type: "numeric", nullable: false),
-                    LineTotal = table.Column<decimal>(type: "numeric", nullable: false)
+                    LineTotal = table.Column<decimal>(type: "numeric", nullable: false),
+                    CreatedOnUtc = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UpdatedOnUtc = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -502,7 +540,8 @@ namespace VeloDrive.Infrastructure.Persistence.Migrations
                     Notes = table.Column<string>(type: "text", nullable: true),
                     AttachmentUrl = table.Column<string>(type: "text", nullable: true),
                     RecordedByUserId = table.Column<Guid>(type: "uuid", nullable: false),
-                    CreatedOnUtc = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                    CreatedOnUtc = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UpdatedOnUtc = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -537,7 +576,9 @@ namespace VeloDrive.Infrastructure.Persistence.Migrations
                     AddOnId = table.Column<Guid>(type: "uuid", nullable: false),
                     Quantity = table.Column<int>(type: "integer", nullable: false),
                     UnitPrice = table.Column<decimal>(type: "numeric", nullable: false),
-                    LineTotal = table.Column<decimal>(type: "numeric", nullable: false)
+                    LineTotal = table.Column<decimal>(type: "numeric", nullable: false),
+                    CreatedOnUtc = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UpdatedOnUtc = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -607,6 +648,17 @@ namespace VeloDrive.Infrastructure.Persistence.Migrations
                 name: "IX_Customers_TenantId",
                 table: "Customers",
                 column: "TenantId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Employees_TenantId",
+                table: "Employees",
+                column: "TenantId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Employees_UserId",
+                table: "Employees",
+                column: "UserId",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Invoices_BookingId",
@@ -730,6 +782,9 @@ namespace VeloDrive.Infrastructure.Persistence.Migrations
 
             migrationBuilder.DropTable(
                 name: "BookingAddOns");
+
+            migrationBuilder.DropTable(
+                name: "Employees");
 
             migrationBuilder.DropTable(
                 name: "Payments");

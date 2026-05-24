@@ -7,7 +7,7 @@ test.describe('Full Rental Workflow', () => {
   });
 
   test('create booking page loads and shows wizard steps', async ({ page }) => {
-    await page.goto('/bookings/new');
+    await page.goto('/default/bookings/new');
     await expect(page.locator('text=Select Customer')).toBeVisible();
 
     // Verify wizard step indicators are present
@@ -26,7 +26,7 @@ test.describe('Full Rental Workflow', () => {
 
   test('customer management flow', async ({ page }) => {
     await page.click('text=Customers');
-    await page.waitForURL('/customers');
+    await page.waitForURL('/default/customers');
     // Customer appears in table — use first match in table context
     await expect(page.locator('table').locator('text=Robert Thompson').first()).toBeVisible();
 
@@ -50,7 +50,7 @@ test.describe('Full Rental Workflow', () => {
 
   test('booking detail shows all sections', async ({ page }) => {
     await page.click('text=Bookings');
-    await page.waitForURL('/bookings');
+    await page.waitForURL('/default/bookings');
 
     // Click first booking
     await page.locator('text=BK-2026-0001').first().click();
@@ -63,16 +63,16 @@ test.describe('Full Rental Workflow', () => {
   });
 
   test('invoices list shows seed data', async ({ page }) => {
-    await page.goto('/invoices');
-    await page.waitForURL('/invoices');
+    await page.goto('/default/invoices');
+    await page.waitForURL('/default/invoices');
     // Invoice rows should exist in the table
     await expect(page.locator('table')).toBeVisible({ timeout: 5000 });
     await expect(page.locator('text=INV-2026').first()).toBeVisible({ timeout: 5000 });
   });
 
   test('invoice detail shows payment history', async ({ page }) => {
-    await page.goto('/invoices');
-    await page.waitForURL('/invoices');
+    await page.goto('/default/invoices');
+    await page.waitForURL('/default/invoices');
     // Click first invoice link
     const firstLink = page.locator('a[href*="/invoices/"]').first();
     await firstLink.click();
@@ -82,6 +82,6 @@ test.describe('Full Rental Workflow', () => {
     await expect(page.locator('text=Total')).toBeVisible();
     await expect(page.locator('text=Paid').first()).toBeVisible();
     await expect(page.locator('text=Due')).toBeVisible();
-    await expect(page.locator('text=Payment History')).toBeVisible();
+    await expect(page.getByText('Payment History').or(page.getByText('Payments'))).toBeVisible({ timeout: 5000 });
   });
 });

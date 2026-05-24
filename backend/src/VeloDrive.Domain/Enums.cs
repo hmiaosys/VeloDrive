@@ -9,14 +9,6 @@ public enum SubscriptionStatus
     Unpaid
 }
 
-public enum UserRole
-{
-    Owner,
-    Admin,
-    Manager,
-    Staff
-}
-
 public enum UnitType
 {
     Hour,

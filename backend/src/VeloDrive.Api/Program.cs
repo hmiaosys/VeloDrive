@@ -128,6 +128,7 @@ if (app.Environment.IsDevelopment())
 app.UseSerilogRequestLogging();
 app.UseCors("AllowFrontend");
 app.UseTenantResolution();
+app.UseAccountValidation();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();

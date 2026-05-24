@@ -21,9 +21,10 @@ export function LoginPage() {
       const result = await authApi.login({ email, password })
       setAuth(result.accessToken, result.refreshToken, {
         id: result.user.id, tenantId: result.user.tenantId,
-        email: result.user.email, fullName: result.user.fullName, role: result.user.role,
+        email: result.user.email, firstName: result.user.firstName, lastName: result.user.lastName,
+        position: result.user.position, permissions: result.user.permissions, account: result.user.account,
       })
-      navigate('/')
+      navigate(`/${result.user.account}`)
     } catch { setError(t('auth.invalidCredentials')) }
     finally { setLoading(false) }
   }

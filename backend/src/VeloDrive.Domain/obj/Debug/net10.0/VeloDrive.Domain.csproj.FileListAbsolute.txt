@@ -10,3 +10,4 @@ D:\Projects\VeloDrive\backend\src\VeloDrive.Domain\obj\Debug\net10.0\VeloDrive.D
 D:\Projects\VeloDrive\backend\src\VeloDrive.Domain\obj\Debug\net10.0\refint\VeloDrive.Domain.dll
 D:\Projects\VeloDrive\backend\src\VeloDrive.Domain\obj\Debug\net10.0\VeloDrive.Domain.pdb
 D:\Projects\VeloDrive\backend\src\VeloDrive.Domain\obj\Debug\net10.0\ref\VeloDrive.Domain.dll
+D:\Projects\VeloDrive\backend\src\VeloDrive.Domain\obj\Debug\net10.0\VeloDrive.Domain.sourcelink.json

@@ -10,7 +10,7 @@ export function DashboardPage() {
   const user = useAuthStore((s) => s.user)
   const { data, isLoading } = useQuery({ queryKey: ['dashboard'], queryFn: dashboardApi.get })
 
-  const name = user?.fullName?.split(' ')[0] ?? ''
+  const name = user?.firstName ?? ''
   const greeting = `${t('dashboard.greeting')}${name ? `, ${name}` : ''} 👋`
 
   if (isLoading) return <div className="space-y-6"><div className="h-8 w-48 bg-slate-100 rounded-lg animate-pulse" /><div className="grid grid-cols-4 gap-4">{[1,2,3,4].map(i => <div key={i} className="h-28 bg-white rounded-2xl animate-pulse" />)}</div></div>
@@ -20,10 +20,10 @@ export function DashboardPage() {
   const attention = data?.needsAttention
 
   const statCards = [
-    { value: stats?.itemsOutNow ?? '—', label: 'On Rent Now', icon: Bus, to: '/bookings', bg: 'bg-blue-50', color: 'text-blue-700' },
-    { value: stats?.availableToday ?? '—', label: 'Available Today', icon: Calendar, to: '/items', bg: 'bg-emerald-50', color: 'text-emerald-700' },
-    { value: stats?.pendingQuotes ?? '—', label: 'Pending Quotes', icon: FileText, to: '/quotes', bg: 'bg-amber-50', color: 'text-amber-700' },
-    { value: stats?.activeThisWeek ?? '—', label: 'Active This Week', icon: Clock, to: '/bookings', bg: 'bg-violet-50', color: 'text-violet-700' },
+    { value: stats?.itemsOutNow ?? '—', label: 'On Rent Now', icon: Bus, to: 'bookings', bg: 'bg-blue-50', color: 'text-blue-700' },
+    { value: stats?.availableToday ?? '—', label: 'Available Today', icon: Calendar, to: 'items', bg: 'bg-emerald-50', color: 'text-emerald-700' },
+    { value: stats?.pendingQuotes ?? '—', label: 'Pending Quotes', icon: FileText, to: 'quotes', bg: 'bg-amber-50', color: 'text-amber-700' },
+    { value: stats?.activeThisWeek ?? '—', label: 'Active This Week', icon: Clock, to: 'bookings', bg: 'bg-violet-50', color: 'text-violet-700' },
   ]
 
   return (
@@ -63,7 +63,7 @@ export function DashboardPage() {
                 const isPickup = b.startDate === new Date().toISOString().split('T')[0]
                 const isDropoff = b.endDate === new Date().toISOString().split('T')[0]
                 return (
-                  <Link key={b.id} to={`/bookings/${b.id}`}
+                  <Link key={b.id} to={`bookings/${b.id}`}
                     className="flex items-start gap-4 p-4 rounded-xl bg-slate-50 hover:bg-blue-50/50 transition-colors border border-transparent hover:border-blue-100">
                     <div className={`mt-0.5 px-2 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider ${isPickup ? 'bg-blue-100 text-blue-700' : 'bg-emerald-100 text-emerald-700'}`}>
                       {isPickup ? 'PICKUP' : 'RETURN'}
@@ -108,7 +108,7 @@ export function DashboardPage() {
               {attention?.draftBookings?.length > 0 ? (
                 <div className="space-y-1.5">
                   {attention.draftBookings.map((b: any) => (
-                    <Link key={b.id} to={`/bookings/${b.id}`}
+                    <Link key={b.id} to={`bookings/${b.id}`}
                       className="flex items-center justify-between p-2.5 rounded-lg hover:bg-slate-50 text-sm">
                       <div>
                         <div className="font-medium text-slate-800">{b.customerName}</div>
@@ -150,7 +150,7 @@ export function DashboardPage() {
               {attention?.unpaidInvoices?.length > 0 ? (
                 <div className="space-y-1.5">
                   {attention.unpaidInvoices.map((inv: any) => (
-                    <Link key={inv.id} to={`/invoices/${inv.id}`}
+                    <Link key={inv.id} to={`../../invoices/${inv.id}`}
                       className="flex items-center justify-between p-2.5 rounded-lg hover:bg-slate-50 text-sm">
                       <div>
                         <div className="font-medium text-slate-800">{inv.customerName}</div>

@@ -26,6 +26,7 @@
   "sidebar": {
     "dashboard": "Dashboard",
     "items": "Items",
+    "categories": "Categories",
     "addons": "Add-ons",
     "customers": "Customers",
     "bookings": "Bookings",
@@ -46,6 +47,7 @@
     "shortcuts": {
       "dashboard": "G D",
       "items": "G I",
+      "categories": "G C",
       "addons": "G A",
       "customers": "G C",
       "bookings": "G B",

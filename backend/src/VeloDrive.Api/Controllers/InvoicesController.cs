@@ -54,7 +54,7 @@ public class InvoicesController : ControllerBase
     {
         var i = await _db.Invoices
             .Include(x => x.Booking).ThenInclude(b => b.Customer)
-            .Include(x => x.Payments).ThenInclude(p => p.RecordedByUser)
+            .Include(x => x.Payments).ThenInclude(p => p.RecordedByUser).ThenInclude(u => u.Employee)
             .FirstOrDefaultAsync(x => x.Id == id);
 
         if (i is null) return NotFound();
@@ -69,7 +69,10 @@ public class InvoicesController : ControllerBase
             payments = i.Payments.Select(p => new
             {
                 p.Id, p.Amount, Method = p.Method.ToString(), p.Reference,
-                p.ReceivedAt, p.Notes, RecordedBy = p.RecordedByUser.FullName
+                p.ReceivedAt, p.Notes,
+                RecordedBy = p.RecordedByUser.Employee != null
+                    ? p.RecordedByUser.Employee.FirstName + " " + p.RecordedByUser.Employee.LastName
+                    : "Unknown"
             })
         });
     }
@@ -78,7 +81,7 @@ public class InvoicesController : ControllerBase
     [Authorize(Policy = Permissions.InvoicesWrite)]
     public async Task<ActionResult> Create([FromBody] CreateInvoiceRequest request)
     {
-        var booking = await _db.Bookings.FindAsync(request.BookingId);
+        var booking = await _db.Bookings.FirstOrDefaultAsync(b => b.Id == request.BookingId);
         if (booking is null) return NotFound("Booking not found");
 
         var count = await _db.Invoices.CountAsync();
@@ -110,7 +113,7 @@ public class InvoicesController : ControllerBase
     [Authorize(Policy = Permissions.PaymentsWrite)]
     public async Task<ActionResult> RecordPayment(Guid id, [FromBody] RecordPaymentRequest request)
     {
-        var invoice = await _db.Invoices.FindAsync(id);
+        var invoice = await _db.Invoices.FirstOrDefaultAsync(i => i.Id == id);
         if (invoice is null) return NotFound();
 
         var userId = Guid.Parse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)!.Value);
@@ -146,7 +149,7 @@ public class InvoicesController : ControllerBase
     [Authorize(Policy = Permissions.InvoicesSend)]
     public async Task<ActionResult> Send(Guid id)
     {
-        var invoice = await _db.Invoices.FindAsync(id);
+        var invoice = await _db.Invoices.FirstOrDefaultAsync(i => i.Id == id);
         if (invoice is null) return NotFound();
 
         invoice.Status = InvoiceStatus.Sent;
@@ -160,7 +163,7 @@ public class InvoicesController : ControllerBase
     [Authorize(Policy = Permissions.InvoicesVoid)]
     public async Task<ActionResult> Void(Guid id)
     {
-        var invoice = await _db.Invoices.FindAsync(id);
+        var invoice = await _db.Invoices.FirstOrDefaultAsync(i => i.Id == id);
         if (invoice is null) return NotFound();
 
         invoice.Status = InvoiceStatus.Void;

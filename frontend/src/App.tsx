@@ -18,6 +18,7 @@ import { AddOnsListPage } from './pages/addons/AddOnsListPage'
 import { ReportsPage } from './pages/reports/ReportsPage'
 import { SettingsPage } from './pages/settings/SettingsPage'
 import { TeamPage } from './pages/settings/TeamPage'
+import { CategoriesPage } from './pages/categories/CategoriesPage'
 
 function App() {
   return (
@@ -26,28 +27,42 @@ function App() {
       <Routes>
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
-        <Route element={<ProtectedRoute />}>
+        <Route path="/:account" element={<ProtectedRoute />}>
           <Route element={<DashboardLayout />}>
-            <Route path="/" element={<DashboardPage />} />
-            <Route path="/items" element={<ItemsListPage />} />
-            <Route path="/items/new" element={<ItemNewPage />} />
-            <Route path="/addons" element={<AddOnsListPage />} />
-            <Route path="/customers" element={<CustomersListPage />} />
-            <Route path="/bookings" element={<BookingsListPage />} />
-            <Route path="/bookings/new" element={<BookingsNewPage />} />
-            <Route path="/bookings/:id" element={<BookingDetailPage />} />
-            <Route path="/quotes" element={<QuotesListPage />} />
-            <Route path="/invoices" element={<InvoicesListPage />} />
-            <Route path="/invoices/:id" element={<InvoiceDetailPage />} />
-            <Route path="/reports" element={<ReportsPage />} />
-            <Route path="/settings" element={<SettingsPage />} />
-            <Route path="/settings/team" element={<TeamPage />} />
-            <Route path="*" element={<Navigate to="/" replace />} />
+            <Route index element={<DashboardPage />} />
+            <Route path="items" element={<ItemsListPage />} />
+            <Route path="items/new" element={<ItemNewPage />} />
+            <Route path="categories" element={<CategoriesPage />} />
+            <Route path="addons" element={<AddOnsListPage />} />
+            <Route path="customers" element={<CustomersListPage />} />
+            <Route path="bookings" element={<BookingsListPage />} />
+            <Route path="bookings/new" element={<BookingsNewPage />} />
+            <Route path="bookings/:id" element={<BookingDetailPage />} />
+            <Route path="quotes" element={<QuotesListPage />} />
+            <Route path="invoices" element={<InvoicesListPage />} />
+            <Route path="invoices/:id" element={<InvoiceDetailPage />} />
+            <Route path="reports" element={<ReportsPage />} />
+            <Route path="settings" element={<SettingsPage />} />
+            <Route path="settings/team" element={<TeamPage />} />
+            <Route path="*" element={<Navigate to="." replace />} />
           </Route>
         </Route>
+        <Route path="*" element={<NavigateToAccount />} />
       </Routes>
     </>
   )
+}
+
+function NavigateToAccount() {
+  const stored = localStorage.getItem('auth-storage')
+  if (stored) {
+    try {
+      const data = JSON.parse(stored)
+      const account = data?.state?.user?.account || data?.state?.user?.Subdomain
+      if (account) return <Navigate to={`/${account}`} replace />
+    } catch {}
+  }
+  return <Navigate to="/login" replace />
 }
 
 export default App

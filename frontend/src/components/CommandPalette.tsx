@@ -2,15 +2,15 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Command } from 'cmdk'
-import { LayoutDashboard, Bus, Package, Users, BookOpen, FileText, Receipt, BarChart3, Settings, Plus, Search } from 'lucide-react'
+import { LayoutDashboard, Bus, Package, Users, BookOpen, FileText, Receipt, BarChart3, Settings, Plus, Search, Layers } from 'lucide-react'
 
 const iconMap: Record<string, any> = {
-  LayoutDashboard, Bus, Package, Users, BookOpen, FileText, Receipt, BarChart3, Settings, Plus,
+  LayoutDashboard, Bus, Package, Users, BookOpen, FileText, Receipt, BarChart3, Settings, Plus, Layers,
 }
 
-const pageKeys = ['dashboard','items','addons','customers','bookings','newBooking','quotes','invoices','reports','settings'] as const
+const pageKeys = ['dashboard','items','categories','addons','customers','bookings','newBooking','quotes','invoices','reports','settings'] as const
 const pageRoutes: Record<string, string> = {
-  dashboard: '/', items: '/items', addons: '/addons', customers: '/customers',
+  dashboard: '/', items: '/items', categories: '/categories', addons: '/addons', customers: '/customers',
   bookings: '/bookings', newBooking: '/bookings/new', quotes: '/quotes',
   invoices: '/invoices', reports: '/reports', settings: '/settings',
 }

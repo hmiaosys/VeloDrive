@@ -13,6 +13,7 @@ public class Payment : ITenantEntity
     public string? AttachmentUrl { get; set; }
     public Guid RecordedByUserId { get; set; }
     public DateTime CreatedOnUtc { get; set; } = DateTime.UtcNow;
+    public DateTime UpdatedOnUtc { get; set; } = DateTime.UtcNow;
 
     public Tenant Tenant { get; set; } = null!;
     public Invoice Invoice { get; set; } = null!;

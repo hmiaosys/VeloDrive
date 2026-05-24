@@ -44,7 +44,9 @@ public class AddOnsController : ControllerBase
             Description = input.Description,
             UnitType = input.UnitType,
             BasePrice = input.BasePrice,
-            IsPerItem = input.IsPerItem
+            IsPerItem = input.IsPerItem,
+            Quantity = input.Quantity,
+            CustomFields = input.CustomFields,
         };
         _db.ItemAddOns.Add(addon);
         await _db.SaveChangesAsync();
@@ -55,7 +57,7 @@ public class AddOnsController : ControllerBase
     [Authorize(Policy = Permissions.AddOnsWrite)]
     public async Task<ActionResult> Update(Guid id, [FromBody] AddOnDto input)
     {
-        var addon = await _db.ItemAddOns.FindAsync(id);
+        var addon = await _db.ItemAddOns.FirstOrDefaultAsync(a => a.Id == id);
         if (addon is null) return NotFound();
 
         addon.Name = input.Name;
@@ -63,6 +65,8 @@ public class AddOnsController : ControllerBase
         addon.UnitType = input.UnitType;
         addon.BasePrice = input.BasePrice;
         addon.IsPerItem = input.IsPerItem;
+        addon.Quantity = input.Quantity;
+        addon.CustomFields = input.CustomFields;
         addon.UpdatedOnUtc = DateTime.UtcNow;
 
         await _db.SaveChangesAsync();
@@ -73,7 +77,7 @@ public class AddOnsController : ControllerBase
     [Authorize(Policy = Permissions.AddOnsDelete)]
     public async Task<IActionResult> Delete(Guid id)
     {
-        var addon = await _db.ItemAddOns.FindAsync(id);
+        var addon = await _db.ItemAddOns.FirstOrDefaultAsync(a => a.Id == id);
         if (addon is null) return NotFound();
         addon.IsActive = false;
         await _db.SaveChangesAsync();
@@ -86,4 +90,6 @@ public record AddOnDto(
     string? Description,
     UnitType UnitType,
     decimal BasePrice,
-    bool IsPerItem);
+    bool IsPerItem,
+    int Quantity = 1,
+    string? CustomFields = null);

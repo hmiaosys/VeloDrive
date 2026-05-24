@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -9,7 +10,6 @@ using VeloDrive.Infrastructure.Persistence;
 namespace VeloDrive.Api.Controllers;
 
 [ApiController]
-[Route("api/tenant")]
 [Authorize]
 public class TenantController : ControllerBase
 {
@@ -24,85 +24,90 @@ public class TenantController : ControllerBase
         _tenant = tenant;
     }
 
-    [HttpGet]
+    [HttpGet("api/tenant")]
     public async Task<ActionResult> Get()
     {
-        var tenant = await _db.Tenants.FindAsync(_tenant.TenantId);
-        if (tenant is null) return NotFound();
-        return Ok(new { tenant.Id, tenant.Name, tenant.Subdomain, tenant.Currency, tenant.Timezone, tenant.LogoUrl, tenant.PrimaryColor });
+        var t = await _db.Tenants.FindAsync(_tenant.TenantId);
+        if (t is null) return NotFound();
+        return Ok(new { t.Id, t.Name, t.Subdomain, t.Currency, t.Timezone, t.LogoUrl, t.PrimaryColor });
     }
 
-    [HttpPut]
+    [HttpPut("api/tenant")]
     [Authorize(Policy = Permissions.SettingsWrite)]
     public async Task<ActionResult> Update([FromBody] TenantSettingsDto dto)
     {
-        var tenant = await _db.Tenants.FindAsync(_tenant.TenantId);
-        if (tenant is null) return NotFound();
-
-        tenant.Name = dto.Name ?? tenant.Name;
-        tenant.Currency = dto.Currency ?? tenant.Currency;
-        tenant.Timezone = dto.Timezone ?? tenant.Timezone;
-        tenant.PrimaryColor = dto.PrimaryColor ?? tenant.PrimaryColor;
-        tenant.LogoUrl = dto.LogoUrl ?? tenant.LogoUrl;
-
+        var t = await _db.Tenants.FindAsync(_tenant.TenantId);
+        if (t is null) return NotFound();
+        t.Name = dto.Name ?? t.Name;
+        t.Currency = dto.Currency ?? t.Currency;
+        t.Timezone = dto.Timezone ?? t.Timezone;
+        t.PrimaryColor = dto.PrimaryColor ?? t.PrimaryColor;
+        t.LogoUrl = dto.LogoUrl ?? t.LogoUrl;
+        t.UpdatedOnUtc = DateTime.UtcNow;
         await _db.SaveChangesAsync();
-        return Ok(new { tenant.Id, tenant.Name, tenant.Subdomain, tenant.Currency, tenant.Timezone, tenant.LogoUrl, tenant.PrimaryColor });
+        return Ok(new { t.Id, t.Name, t.Subdomain, t.Currency, t.Timezone, t.LogoUrl, t.PrimaryColor });
     }
 
-    [HttpGet("users")]
+    [HttpGet("api/employees")]
     [Authorize(Policy = Permissions.UsersRead)]
-    public async Task<ActionResult> GetUsers()
+    public async Task<ActionResult> GetEmployees()
     {
-        var users = await _db.Users
-            .Where(u => u.TenantId == _tenant.TenantId)
-            .Select(u => new { u.Id, u.Email, u.FullName, u.Role, u.IsActive })
+        var employees = await _db.Employees
+            .Where(e => e.TenantId == _tenant.TenantId)
+            .Select(e => new { e.Id, e.FirstName, e.LastName, e.Email, e.Phone, e.Position, e.IsActive, e.UserId })
             .ToListAsync();
-
-        return Ok(users);
+        return Ok(employees);
     }
 
-    [HttpPost("users/invite")]
+    [HttpPost("api/employees/invite")]
     [Authorize(Policy = Permissions.UsersWrite)]
-    public async Task<ActionResult> InviteUser([FromBody] InviteUserDto dto)
+    public async Task<ActionResult> Invite([FromBody] InviteEmployeeDto dto)
     {
-        if (!Enum.TryParse<UserRole>(dto.Role, true, out var role))
-            return BadRequest("Invalid role.");
-
         var user = new ApplicationUser
         {
             Id = Guid.NewGuid(),
             TenantId = _tenant.TenantId,
             UserName = dto.Email,
             Email = dto.Email,
-            FullName = dto.FullName,
-            Role = role
         };
-
         var result = await _userManager.CreateAsync(user, dto.Password);
-        if (!result.Succeeded)
-            return BadRequest(result.Errors);
+        if (!result.Succeeded) return BadRequest(result.Errors);
 
-        return Ok(new { user.Id, user.Email, user.FullName, user.Role, user.IsActive });
+        var employee = new Employee
+        {
+            Id = Guid.NewGuid(),
+            TenantId = _tenant.TenantId,
+            UserId = user.Id,
+            FirstName = dto.FirstName,
+            LastName = dto.LastName,
+            Email = dto.Email,
+            Position = dto.Position,
+        };
+        _db.Employees.Add(employee);
+
+        var template = dto.PermissionTemplate ?? "Staff";
+        if (Permissions.Templates.TryGetValue(template, out var perms))
+            foreach (var p in perms)
+                await _userManager.AddClaimAsync(user, new Claim("permission", p));
+
+        await _db.SaveChangesAsync();
+        return Ok(new { employee.Id, employee.FirstName, employee.LastName, employee.Position, employee.IsActive });
     }
 
-    [HttpPut("users/{id:guid}")]
+    [HttpPut("api/employees/{id:guid}")]
     [Authorize(Policy = Permissions.UsersWrite)]
-    public async Task<ActionResult> UpdateUser(Guid id, [FromBody] UpdateUserDto dto)
+    public async Task<ActionResult> UpdateEmployee(Guid id, [FromBody] UpdateEmployeeDto dto)
     {
-        var user = await _db.Users.FirstOrDefaultAsync(u => u.Id == id && u.TenantId == _tenant.TenantId);
-        if (user is null) return NotFound();
-
-        if (!Enum.TryParse<UserRole>(dto.Role, true, out var role))
-            return BadRequest("Invalid role.");
-
-        user.Role = role;
-        user.IsActive = dto.IsActive;
+        var emp = await _db.Employees.FirstOrDefaultAsync(e => e.Id == id);
+        if (emp is null || emp.TenantId != _tenant.TenantId) return NotFound();
+        emp.Position = dto.Position ?? emp.Position;
+        emp.IsActive = dto.IsActive;
+        emp.UpdatedOnUtc = DateTime.UtcNow;
         await _db.SaveChangesAsync();
-
-        return Ok(new { user.Id, user.Email, user.FullName, user.Role, user.IsActive });
+        return Ok(new { emp.Id, emp.FirstName, emp.LastName, emp.Position, emp.IsActive });
     }
 }
 
 public record TenantSettingsDto(string? Name, string? Currency, string? Timezone, string? PrimaryColor, string? LogoUrl);
-public record InviteUserDto(string Email, string FullName, string Role, string Password);
-public record UpdateUserDto(string Role, bool IsActive);
+public record InviteEmployeeDto(string FirstName, string LastName, string Email, string Password, string Position, string? PermissionTemplate = "Staff");
+public record UpdateEmployeeDto(string? Position, bool IsActive);

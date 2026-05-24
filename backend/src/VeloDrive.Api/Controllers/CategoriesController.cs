@@ -78,7 +78,10 @@ public class CategoriesController : ControllerBase
     [Authorize(Policy = Permissions.CategoriesWrite)]
     public async Task<ActionResult<CategoryResponse>> Update(Guid id, [FromBody] CreateCategoryRequest request)
     {
-        var category = await _db.ItemCategories.FindAsync(id);
+        var category = await _db.ItemCategories
+            .IgnoreQueryFilters()
+            .Include(x => x.Items)
+            .FirstOrDefaultAsync(c => c.Id == id && c.TenantId == _tenant.TenantId);
         if (category is null) return NotFound();
 
         category.Name = request.Name;
@@ -93,7 +96,7 @@ public class CategoriesController : ControllerBase
         return Ok(new CategoryResponse(category.Id, category.Name, category.Slug,
             category.Description, category.AttributeSchema,
             category.DisplayOrder, category.IsActive,
-            await _db.Items.CountAsync(i => i.CategoryId == id),
+            category.Items.Count,
             category.CreatedOnUtc));
     }
 
@@ -101,7 +104,9 @@ public class CategoriesController : ControllerBase
     [Authorize(Policy = Permissions.CategoriesDelete)]
     public async Task<IActionResult> Delete(Guid id)
     {
-        var category = await _db.ItemCategories.FindAsync(id);
+        var category = await _db.ItemCategories
+            .Include(x => x.Items)
+            .FirstOrDefaultAsync(c => c.Id == id);
         if (category is null) return NotFound();
 
         category.IsActive = false;

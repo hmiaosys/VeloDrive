@@ -62,7 +62,7 @@ public class ItemsController : ControllerBase
     [Authorize(Policy = Permissions.ItemsWrite)]
     public async Task<ActionResult<ItemResponse>> Create([FromBody] CreateItemRequest request)
     {
-        var category = await _db.ItemCategories.FindAsync(request.CategoryId);
+        var category = await _db.ItemCategories.FirstOrDefaultAsync(i => i.Id == request.CategoryId);
         if (category is null) return BadRequest("Category not found.");
 
         var item = new Item
@@ -125,7 +125,7 @@ public class ItemsController : ControllerBase
     [Authorize(Policy = Permissions.ItemsDelete)]
     public async Task<IActionResult> Delete(Guid id)
     {
-        var item = await _db.Items.FindAsync(id);
+        var item = await _db.Items.FirstOrDefaultAsync(i => i.Id == id);
         if (item is null) return NotFound();
 
         item.IsActive = false;
@@ -138,7 +138,7 @@ public class ItemsController : ControllerBase
     [HttpGet("{id:guid}/availability")]
     public async Task<ActionResult> GetAvailability(Guid id, [FromQuery] DateOnly start, [FromQuery] DateOnly end)
     {
-        var item = await _db.Items.FindAsync(id);
+        var item = await _db.Items.FirstOrDefaultAsync(i => i.Id == id);
         if (item is null) return NotFound();
 
         var conflictingBookings = await _db.BookingItems

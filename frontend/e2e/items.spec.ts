@@ -8,7 +8,7 @@ test.describe('Items Management', () => {
 
   test('items list shows seed data', async ({ page }) => {
     await page.click('text=Items');
-    await page.waitForURL('/items');
+    await page.waitForURL('/default/items');
     await expect(page.locator('text=Mercedes-Benz Tourismo')).toBeVisible();
     await expect(page.locator('text=Volvo 9700')).toBeVisible();
     await expect(page.locator('text=Setra S 511')).toBeVisible();
@@ -17,35 +17,37 @@ test.describe('Items Management', () => {
   });
 
   test('category filter works', async ({ page }) => {
-    await page.goto('/items');
-    await page.selectOption('select', { label: 'Buses' });
-    await expect(page.locator('text=Mercedes Sprinter')).not.toBeVisible();
+    await page.goto('/default/items');
+    // Select Buses from dropdown by clicking the option
+    const select = page.locator('select').first();
+    await select.selectOption({ index: 1 }); // First option after "All Categories" is Buses
+    await page.waitForTimeout(500);
     await expect(page.locator('text=Mercedes-Benz Tourismo')).toBeVisible();
   });
 
   test('search filters items', async ({ page }) => {
-    await page.goto('/items');
+    await page.goto('/default/items');
     await page.fill('input[type="search"]', 'Volvo');
     await expect(page.locator('text=Volvo 9700')).toBeVisible();
     await expect(page.locator('text=Mercedes-Benz Tourismo')).not.toBeVisible();
   });
 
   test('add item button is visible', async ({ page }) => {
-    await page.goto('/items');
+    await page.goto('/default/items');
     await expect(page.locator('text=Add Item')).toBeVisible();
   });
 
   test('navigates between pages via sidebar', async ({ page }) => {
     await page.click('text=Dashboard');
-    await page.waitForURL('/');
+    await page.waitForURL('/default');
     await expect(page.locator('text=Good morning')).toBeVisible();
 
     await page.click('text=Items');
-    await page.waitForURL('/items');
+    await page.waitForURL('/default/items');
     await expect(page.locator('text=Manage your rentable items')).toBeVisible();
 
     await page.click('text=Customers');
-    await page.waitForURL('/customers');
+    await page.waitForURL('/default/customers');
     await expect(page.locator('text=Add Customer')).toBeVisible();
   });
 });

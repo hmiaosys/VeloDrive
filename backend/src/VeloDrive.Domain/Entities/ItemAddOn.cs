@@ -9,6 +9,8 @@ public class ItemAddOn : ITenantEntity
     public UnitType UnitType { get; set; } = UnitType.Day;
     public decimal BasePrice { get; set; }
     public bool IsPerItem { get; set; }
+    public int Quantity { get; set; } = 1;
+    public string? CustomFields { get; set; } // JSONB: per-instance info
     public bool IsActive { get; set; } = true;
     public DateTime CreatedOnUtc { get; set; } = DateTime.UtcNow;
     public DateTime UpdatedOnUtc { get; set; } = DateTime.UtcNow;

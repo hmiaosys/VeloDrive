@@ -19,6 +19,7 @@ public static class DependencyInjection
         services.AddDbContext<AppDbContext>(options =>
             options.UseNpgsql(connectionString));
 
+        services.AddSingleton<ITenantProvider, TenantProvider>();
         services.AddScoped<CurrentTenant>();
         services.AddScoped<ICurrentTenant>(sp => sp.GetRequiredService<CurrentTenant>());
 

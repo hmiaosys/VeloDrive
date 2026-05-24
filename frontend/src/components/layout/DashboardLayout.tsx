@@ -3,7 +3,7 @@ import { AnimatePresence } from 'framer-motion'
 import { useTranslation } from 'react-i18next'
 import { useAuthStore } from '@/stores/authStore'
 import {
-  LayoutDashboard, Bus, Package, Users, BookOpen,
+  LayoutDashboard, Bus, Package, Users, BookOpen, Layers,
   FileText, Receipt, BarChart3, Settings, LogOut, Menu, X, Search, Sparkles
 } from 'lucide-react'
 import { useState } from 'react'
@@ -15,6 +15,7 @@ import { LanguageSwitcher } from '@/components/LanguageSwitcher'
 const iconMap: Record<string, any> = {
   dashboard: LayoutDashboard, items: Bus, addons: Package, customers: Users,
   bookings: BookOpen, quotes: FileText, invoices: Receipt, reports: BarChart3, settings: Settings,
+  categories: Layers,
 }
 
 export function DashboardLayout() {
@@ -26,9 +27,9 @@ export function DashboardLayout() {
 
   const handleLogout = () => { clearAuth(); navigate('/login') }
 
-  const navKeys = ['dashboard','items','addons','customers','bookings','quotes','invoices','reports','settings']
+  const navKeys = ['dashboard','items','categories','addons','customers','bookings','quotes','invoices','reports','settings']
   const navItems = navKeys.map(key => ({
-    to: key === 'dashboard' ? '/' : `/${key}`,
+    to: key === 'dashboard' ? '.' : key,
     icon: iconMap[key],
     label: t(`sidebar.${key}`),
   }))
@@ -74,10 +75,10 @@ export function DashboardLayout() {
         <div className="border-t border-white/10 p-4">
           <div className="flex items-center gap-3">
             <div className="h-8 w-8 rounded-full bg-gradient-to-br from-blue-400 to-indigo-500 flex items-center justify-center text-xs font-bold text-white">
-              {user?.fullName?.split(' ').map(n => n[0]).join('')}
+              {(user?.firstName?.[0] ?? '') + (user?.lastName?.[0] ?? '')}
             </div>
             <div className="flex-1 min-w-0">
-              <div className="text-sm font-medium text-white truncate">{user?.fullName}</div>
+              <div className="text-sm font-medium text-white truncate">{user?.firstName + ' ' + user?.lastName}</div>
               <div className="text-[10px] text-slate-500 truncate">{user?.email}</div>
             </div>
           </div>

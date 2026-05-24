@@ -48,7 +48,7 @@ public class CustomersController : ControllerBase
     [HttpGet("{id:guid}")]
     public async Task<ActionResult<CustomerResponse>> GetById(Guid id)
     {
-        var c = await _db.Customers.FindAsync(id);
+        var c = await _db.Customers.FirstOrDefaultAsync(c => c.Id == id);
         if (c is null) return NotFound();
 
         var bookings = await _db.Bookings
@@ -101,7 +101,7 @@ public class CustomersController : ControllerBase
     [Authorize(Policy = Permissions.CustomersWrite)]
     public async Task<ActionResult<CustomerResponse>> Update(Guid id, [FromBody] CreateCustomerRequest request)
     {
-        var c = await _db.Customers.FindAsync(id);
+        var c = await _db.Customers.FirstOrDefaultAsync(c => c.Id == id);
         if (c is null) return NotFound();
 
         c.FirstName = request.FirstName;
@@ -125,7 +125,7 @@ public class CustomersController : ControllerBase
     [Authorize(Policy = Permissions.CustomersDelete)]
     public async Task<IActionResult> Delete(Guid id)
     {
-        var c = await _db.Customers.FindAsync(id);
+        var c = await _db.Customers.FirstOrDefaultAsync(c => c.Id == id);
         if (c is null) return NotFound();
         _db.Customers.Remove(c);
         await _db.SaveChangesAsync();

@@ -9,9 +9,12 @@ namespace VeloDrive.Infrastructure.Persistence;
 
 public class AppDbContext : IdentityDbContext<ApplicationUser, IdentityRole<Guid>, Guid>
 {
-    public AppDbContext(DbContextOptions<AppDbContext> options)
+    private readonly ITenantProvider _tenantProvider;
+
+    public AppDbContext(DbContextOptions<AppDbContext> options, ITenantProvider tenantProvider)
         : base(options)
     {
+        _tenantProvider = tenantProvider;
     }
 
     public DbSet<Tenant> Tenants => Set<Tenant>();
@@ -26,6 +29,7 @@ public class AppDbContext : IdentityDbContext<ApplicationUser, IdentityRole<Guid
     public DbSet<Invoice> Invoices => Set<Invoice>();
     public DbSet<Payment> Payments => Set<Payment>();
     public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
+    public DbSet<Employee> Employees => Set<Employee>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -197,12 +201,28 @@ public class AppDbContext : IdentityDbContext<ApplicationUser, IdentityRole<Guid
                 .OnDelete(DeleteBehavior.Restrict);
         });
 
+        // Employee
+        builder.Entity<Employee>(e =>
+        {
+            e.HasOne(emp => emp.Tenant)
+                .WithMany()
+                .HasForeignKey(emp => emp.TenantId)
+                .OnDelete(DeleteBehavior.Restrict);
+            e.HasOne(emp => emp.User)
+                .WithOne(u => u.Employee)
+                .HasForeignKey<Employee>(emp => emp.UserId)
+                .OnDelete(DeleteBehavior.SetNull);
+        });
+
         // Global tenant query filter
         ApplyTenantFilter(builder);
     }
 
-    private static void ApplyTenantFilter(ModelBuilder builder)
+    private void ApplyTenantFilter(ModelBuilder builder)
     {
+        var providerMethod = typeof(ITenantProvider).GetMethod(nameof(ITenantProvider.GetTenantId))!;
+        var providerExpr = Expression.Constant(_tenantProvider);
+
         foreach (var entityType in builder.Model.GetEntityTypes())
         {
             if (!typeof(ITenantEntity).IsAssignableFrom(entityType.ClrType)) continue;
@@ -210,10 +230,8 @@ public class AppDbContext : IdentityDbContext<ApplicationUser, IdentityRole<Guid
             var parameter = Expression.Parameter(entityType.ClrType, "e");
             var property = Expression.Property(parameter, nameof(ITenantEntity.TenantId));
 
-            // Read TenantId from TenantContext (AsyncLocal) dynamically per-request
-            var tenantContextType = typeof(TenantContext);
-            var tenantIdProperty = tenantContextType.GetProperty(nameof(TenantContext.TenantId))!;
-            var tenantIdExpr = Expression.Property(null, tenantIdProperty);
+            // Call _tenantProvider.GetTenantId() at query time — not cached as constant
+            var tenantIdExpr = Expression.Call(providerExpr, providerMethod);
 
             var equality = Expression.Equal(property, tenantIdExpr);
             var lambda = Expression.Lambda(equality, parameter);

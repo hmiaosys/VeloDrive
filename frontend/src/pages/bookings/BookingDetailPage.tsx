@@ -103,7 +103,7 @@ export function BookingDetailPage() {
           <h3 className="font-semibold text-sm text-slate-900 mb-3">{t('bookings.detail.invoices')}</h3>
           <div className="space-y-2">
             {data.invoices.map((inv: any) => (
-              <Link key={inv.id} to={`/invoices/${inv.id}`} className="flex items-center justify-between p-3 rounded-xl bg-slate-50 hover:bg-slate-100 text-sm">
+              <Link key={inv.id} to={`../../invoices/${inv.id}`} className="flex items-center justify-between p-3 rounded-xl bg-slate-50 hover:bg-slate-100 text-sm">
                 <span className="font-medium text-slate-900">{inv.invoiceNumber}</span><span className="text-slate-500">{inv.type}</span>
                 <span className={inv.status === 'Paid' ? 'text-green-600' : inv.status === 'Overdue' ? 'text-red-600' : 'text-slate-500'}>{inv.status}</span>
                 <span className="font-medium">${inv.totalAmount.toFixed(2)}</span>

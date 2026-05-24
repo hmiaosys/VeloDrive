@@ -34,3 +34,4 @@ D:\Projects\VeloDrive\backend\src\VeloDrive.Infrastructure\obj\Debug\net10.0\Vel
 D:\Projects\VeloDrive\backend\src\VeloDrive.Infrastructure\obj\Debug\net10.0\refint\VeloDrive.Infrastructure.dll
 D:\Projects\VeloDrive\backend\src\VeloDrive.Infrastructure\obj\Debug\net10.0\VeloDrive.Infrastructure.pdb
 D:\Projects\VeloDrive\backend\src\VeloDrive.Infrastructure\obj\Debug\net10.0\ref\VeloDrive.Infrastructure.dll
+D:\Projects\VeloDrive\backend\src\VeloDrive.Infrastructure\obj\Debug\net10.0\VeloDrive.Infrastructure.sourcelink.json

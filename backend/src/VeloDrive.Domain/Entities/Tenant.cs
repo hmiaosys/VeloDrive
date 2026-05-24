@@ -12,6 +12,7 @@ public class Tenant
     public SubscriptionStatus SubscriptionStatus { get; set; } = SubscriptionStatus.Trialing;
     public string? StripeCustomerId { get; set; }
     public DateTime CreatedOnUtc { get; set; } = DateTime.UtcNow;
+    public DateTime UpdatedOnUtc { get; set; } = DateTime.UtcNow;
 
     public ICollection<ApplicationUser> Users { get; set; } = new List<ApplicationUser>();
     public ICollection<ItemCategory> ItemCategories { get; set; } = new List<ItemCategory>();

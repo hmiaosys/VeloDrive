@@ -12,31 +12,31 @@ test.describe('RBAC - Staff User', () => {
 
   test('staff can view items', async ({ page }) => {
     await page.click('text=Items');
-    await page.waitForURL('/items');
+    await page.waitForURL('/default/items');
     await expect(page.locator('text=Mercedes-Benz Tourismo')).toBeVisible();
   });
 
   test('staff can view customers', async ({ page }) => {
     await page.click('text=Customers');
-    await page.waitForURL('/customers');
+    await page.waitForURL('/default/customers');
     await expect(page.locator('text=Robert Thompson')).toBeVisible();
   });
 
   test('staff can view bookings', async ({ page }) => {
     await page.click('text=Bookings');
-    await page.waitForURL('/bookings');
+    await page.waitForURL('/default/bookings');
     await expect(page.locator('text=BK-2026-0001')).toBeVisible();
   });
 
   test('staff can view quotes', async ({ page }) => {
     await page.click('text=Quotes');
-    await page.waitForURL('/quotes');
+    await page.waitForURL('/default/quotes');
     await expect(page.locator('text=Quotes').first()).toBeVisible();
   });
 
   test('staff can view invoices', async ({ page }) => {
-    await page.goto('/invoices');
-    await page.waitForURL('/invoices');
+    await page.goto('/default/invoices');
+    await page.waitForURL('/default/invoices');
     await expect(page.locator('table')).toBeVisible({ timeout: 5000 });
   });
 
@@ -45,9 +45,9 @@ test.describe('RBAC - Staff User', () => {
     // Staff can see CRUD buttons on the frontend, but API calls
     // to create/update/delete endpoints return 403.
     // This test verifies the UI loads correctly for staff.
-    await page.goto('/items');
+    await page.goto('/default/items');
     await expect(page.locator('text=Items').first()).toBeVisible();
-    await page.goto('/bookings');
+    await page.goto('/default/bookings');
     await expect(page.locator('text=Bookings').first()).toBeVisible();
   });
 });

@@ -7,12 +7,9 @@ public record RegisterRequest(
     string Email,
     string Password);
 
-public record LoginRequest(
-    string Email,
-    string Password);
+public record LoginRequest(string Email, string Password);
 
-public record RefreshRequest(
-    string RefreshToken);
+public record RefreshRequest(string RefreshToken);
 
 public record AuthResponse(
     string AccessToken,
@@ -24,5 +21,8 @@ public record UserDto(
     Guid Id,
     Guid TenantId,
     string Email,
-    string FullName,
-    string Role);
+    string FirstName,
+    string LastName,
+    string Position,
+    List<string> Permissions,
+    string Account);

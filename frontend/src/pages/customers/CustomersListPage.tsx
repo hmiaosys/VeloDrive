@@ -79,7 +79,7 @@ export function CustomersListPage() {
             <tbody>
               {customers.map((c: CustomerResponse) => (
                 <tr key={c.id} className="border-b border-slate-100 hover:bg-slate-50/50">
-                  <td className="px-5 py-3"><Link to={`/customers/${c.id}`} className="font-medium hover:underline text-slate-900">{c.firstName} {c.lastName}</Link><div className="text-xs text-slate-400">{c.source}</div></td>
+                  <td className="px-5 py-3"><Link to={`${c.id}`} className="font-medium hover:underline text-slate-900">{c.firstName} {c.lastName}</Link><div className="text-xs text-slate-400">{c.source}</div></td>
                   <td className="px-5 py-3 text-slate-500">{c.companyName || '—'}</td>
                   <td className="px-5 py-3">{c.email && <div className="flex items-center gap-1 text-xs text-slate-500"><Mail className="h-3 w-3" />{c.email}</div>}{c.phone && <div className="flex items-center gap-1 text-xs text-slate-500"><Phone className="h-3 w-3" />{c.phone}</div>}</td>
                   <td className="px-5 py-3 text-right">{c.totalBookings}</td>

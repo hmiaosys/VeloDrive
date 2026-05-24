@@ -17,7 +17,6 @@ public static class Permissions
     public const string CustomersRead = "customers:read";
     public const string CustomersWrite = "customers:write";
     public const string CustomersDelete = "customers:delete";
-    public const string CustomersImport = "customers:import";
 
     public const string BookingsRead = "bookings:read";
     public const string BookingsWrite = "bookings:write";
@@ -39,58 +38,25 @@ public static class Permissions
     public const string PaymentsDelete = "payments:delete";
 
     public const string ReportsRead = "reports:read";
-
-    public const string SettingsRead = "settings:read";
     public const string SettingsWrite = "settings:write";
-
     public const string UsersRead = "users:read";
     public const string UsersWrite = "users:write";
 
-    /// <summary>All permissions grouped by role</summary>
-    public static readonly Dictionary<UserRole, string[]> RolePermissions = new()
-    {
-        [UserRole.Owner] = AllPermissions,
-        [UserRole.Admin] = new[]
-        {
-            ItemsRead, ItemsWrite, ItemsDelete,
-            CategoriesRead, CategoriesWrite, CategoriesDelete,
-            AddOnsRead, AddOnsWrite, AddOnsDelete,
-            CustomersRead, CustomersWrite, CustomersDelete, CustomersImport,
-            BookingsRead, BookingsWrite, BookingsDelete, BookingsManageStatus,
-            QuotesRead, QuotesWrite, QuotesSend, QuotesManageStatus,
-            InvoicesRead, InvoicesWrite, InvoicesSend, InvoicesVoid,
-            PaymentsRead, PaymentsWrite, PaymentsDelete,
-            ReportsRead,
-            SettingsRead,
-        },
-        [UserRole.Manager] = new[]
-        {
-            ItemsRead, ItemsWrite,
-            CategoriesRead, CategoriesWrite,
-            AddOnsRead, AddOnsWrite,
-            CustomersRead, CustomersWrite, CustomersImport,
-            BookingsRead, BookingsWrite, BookingsManageStatus,
-            QuotesRead, QuotesWrite, QuotesSend, QuotesManageStatus,
-            InvoicesRead, InvoicesWrite, InvoicesSend,
-            PaymentsRead, PaymentsWrite,
-            ReportsRead,
-        },
-        [UserRole.Staff] = new[]
-        {
-            ItemsRead,
-            CategoriesRead,
-            AddOnsRead,
-            CustomersRead,
-            BookingsRead,
-            QuotesRead,
-            InvoicesRead,
-            PaymentsRead,
-        }
-    };
-
-    private static string[] AllPermissions => typeof(Permissions)
+    public static string[] All => typeof(Permissions)
         .GetFields(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static)
         .Where(f => f.IsLiteral && !f.IsInitOnly && f.FieldType == typeof(string))
         .Select(f => (string)f.GetValue(null)!)
         .ToArray();
+
+    /// <summary>Permission templates applied when creating a user</summary>
+    public static readonly Dictionary<string, string[]> Templates = new()
+    {
+        ["Owner"] = All,
+        ["Staff"] = new[]
+        {
+            ItemsRead, CategoriesRead, AddOnsRead,
+            CustomersRead, BookingsRead, QuotesRead,
+            InvoicesRead, PaymentsRead, ReportsRead,
+        },
+    };
 }

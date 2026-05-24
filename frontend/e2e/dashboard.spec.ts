@@ -26,7 +26,7 @@ test.describe('Dashboard', () => {
 
   test('stat cards are clickable links', async ({ page }) => {
     await page.click('text=On Rent Now');
-    await page.waitForURL('/bookings');
-    await expect(page).toHaveURL('/bookings');
+    await page.waitForURL('/default/bookings');
+    await expect(page).toHaveURL('/default/bookings');
   });
 });

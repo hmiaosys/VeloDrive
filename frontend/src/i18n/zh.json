@@ -26,6 +26,7 @@
   "sidebar": {
     "dashboard": "仪表盘",
     "items": "物品",
+    "categories": "分类",
     "addons": "附加服务",
     "customers": "客户",
     "bookings": "预订",
